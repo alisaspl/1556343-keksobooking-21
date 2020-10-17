@@ -50,6 +50,8 @@ if (mapPinTemplate instanceof HTMLTemplateElement) {
 const el = {
   map: document.querySelector(`.map`),
   form: document.querySelector(`.ad-form`),
+  filters: document.querySelector(`.map__filters`),
+  mapPin: document.querySelector(`.map__pin--main`),
 };
 
 // Mock data ///////////////////////////////
@@ -104,24 +106,44 @@ for (let i = 0; i < 8; i++) {
 
 deactivate();
 
+el.mapPin.addEventListener(`mousedown`, function (ev) {
+  if (ev.button === 0) {
+    activate();
+  }
+});
+
+el.mapPin.addEventListener(`keydown`, function (ev) {
+  if (ev.key === `Enter`) {
+    activate();
+  }
+});
 // Functions ///////////////////////
 
 function activate() {
-
   renderPinsOnMap(mockData);
+  el.map.classList.remove(`map--faded`);
+  el.form.classList.remove(`ad-form--disabled`);
+  el.filters.classList.remove(`ad-form--disabled`);
+  toggleDisableInputs(el.form, false);
+  toggleDisableInputs(el.filters, false);
 }
 
 function deactivate() {
   el.map.classList.add(`map--faded`);
   el.form.classList.add(`ad-form--disabled`);
-  const inputs = el.form.querySelectorAll(`input,select,textarea`);
+  el.filters.classList.add(`ad-form--disabled`);
+  toggleDisableInputs(el.form, true);
+  toggleDisableInputs(el.filters, true);
+}
 
+function toggleDisableInputs(form, disable) {
+  const inputs = form.querySelectorAll(`input,select,textarea`);
   for (let i = 0; i < inputs.length; i++) {
     const fieldset = inputs[i].closest(`fieldset`);
     if (fieldset) {
-      fieldset.disabled = true;
+      fieldset.disabled = disable;
     } else {
-      inputs[i].disabled = true;
+      inputs[i].disabled = disable;
     }
   }
 }

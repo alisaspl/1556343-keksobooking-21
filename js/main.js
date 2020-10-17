@@ -15,7 +15,15 @@ const config = {
   pin: {
     w: 50,
     h: 70,
-  }
+  },
+  mainPin: {
+    w: 62,
+    h: 74,
+  },
+};
+
+const state = {
+  map: null,
 };
 
 const types = [
@@ -52,6 +60,7 @@ const el = {
   form: document.querySelector(`.ad-form`),
   filters: document.querySelector(`.map__filters`),
   mapPin: document.querySelector(`.map__pin--main`),
+  addressInput: document.querySelector(`input#address`),
 };
 
 // Mock data ///////////////////////////////
@@ -108,6 +117,7 @@ deactivate();
 
 el.mapPin.addEventListener(`mousedown`, function (ev) {
   if (ev.button === 0) {
+    fillAddressInput(el.mapPin);
     activate();
   }
 });
@@ -117,9 +127,24 @@ el.mapPin.addEventListener(`keydown`, function (ev) {
     activate();
   }
 });
+
 // Functions ///////////////////////
 
+function fillAddressInput(element) {
+  const x = element.offsetLeft + config.mainPin.w / 2 + config.map.minX;
+  let y = element.offsetTop + config.map.minY;
+
+  if (state.map) {
+    y += config.mainPin.h;
+  } else {
+    y += config.mainPin.w / 2;
+  }
+
+  el.addressInput.value = `${x}, ${y}`;
+}
+
 function activate() {
+  state.map = true;
   renderPinsOnMap(mockData);
   el.map.classList.remove(`map--faded`);
   el.form.classList.remove(`ad-form--disabled`);
@@ -129,6 +154,7 @@ function activate() {
 }
 
 function deactivate() {
+  state.map = false;
   el.map.classList.add(`map--faded`);
   el.form.classList.add(`ad-form--disabled`);
   el.filters.classList.add(`ad-form--disabled`);

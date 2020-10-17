@@ -47,6 +47,11 @@ if (mapPinTemplate instanceof HTMLTemplateElement) {
   throw new Error(`pin template not found`);
 }
 
+const el = {
+  map: document.querySelector(`.map`),
+  form: document.querySelector(`.ad-form`),
+};
+
 // Mock data ///////////////////////////////
 
 const photos = [
@@ -96,9 +101,30 @@ const mockData = [];
 for (let i = 0; i < 8; i++) {
   mockData.push(generateMockObject(i));
 }
-renderPinsOnMap(mockData);
+
+deactivate();
 
 // Functions ///////////////////////
+
+function activate() {
+
+  renderPinsOnMap(mockData);
+}
+
+function deactivate() {
+  el.map.classList.add(`map--faded`);
+  el.form.classList.add(`ad-form--disabled`);
+  const inputs = el.form.querySelectorAll(`input,select,textarea`);
+
+  for (let i = 0; i < inputs.length; i++) {
+    const fieldset = inputs[i].closest(`fieldset`);
+    if (fieldset) {
+      fieldset.disabled = true;
+    } else {
+      inputs[i].disabled = true;
+    }
+  }
+}
 
 function renderPinsOnMap(advsData) {
   const advContainer = document.createDocumentFragment();

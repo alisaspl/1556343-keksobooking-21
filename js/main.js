@@ -114,6 +114,7 @@ for (let i = 0; i < 8; i++) {
 }
 
 deactivate();
+fillAddressInput(el.mapPin);
 
 el.mapPin.addEventListener(`mousedown`, function (ev) {
   if (ev.button === 0) {

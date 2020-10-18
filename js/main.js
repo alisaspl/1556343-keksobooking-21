@@ -60,7 +60,11 @@ const el = {
   form: document.querySelector(`.ad-form`),
   filters: document.querySelector(`.map__filters`),
   mapPin: document.querySelector(`.map__pin--main`),
-  addressInput: document.querySelector(`input#address`),
+  submitForm: {
+    addressInput: document.querySelector(`input#address`),
+    roomsInput: document.querySelector(`select#room_number`),
+    guestsInput: document.querySelector(`select#capacity`),
+  },
 };
 
 // Mock data ///////////////////////////////
@@ -115,6 +119,8 @@ for (let i = 0; i < 8; i++) {
 
 deactivate();
 fillAddressInput(el.mapPin);
+disableGuests();
+validateGuests();
 
 el.mapPin.addEventListener(`mousedown`, function (ev) {
   if (ev.button === 0) {
@@ -129,7 +135,41 @@ el.mapPin.addEventListener(`keydown`, function (ev) {
   }
 });
 
+el.submitForm.roomsInput.addEventListener(`change`, function () {
+  disableGuests();
+  validateGuests();
+});
+
+el.submitForm.guestsInput.addEventListener(`change`, function () {
+  validateGuests();
+});
+
 // Functions ///////////////////////
+
+function validateGuests() {
+  const input = el.submitForm.guestsInput;
+  if (input.options[input.selectedIndex].disabled) {
+    input.setCustomValidity(`error`);
+  } else {
+    input.setCustomValidity(``);
+  }
+}
+
+function disableGuests() {
+  const roomsNumber = parseInt(el.submitForm.roomsInput.value, 10);
+  const guests = el.submitForm.guestsInput;
+
+  for (let i = 0; i < guests.options.length; i++) {
+    const guestsNumber = parseInt(guests.options[i].value, 10);
+    if (roomsNumber === 100 && guestsNumber !== 0) {
+      guests.options[i].disabled = true;
+    } else if (guestsNumber > roomsNumber || (guestsNumber === 0 && roomsNumber !== 100)) {
+      guests.options[i].disabled = true;
+    } else {
+      guests.options[i].disabled = false;
+    }
+  }
+}
 
 function fillAddressInput(element) {
   const x = element.offsetLeft + config.mainPin.w / 2 + config.map.minX;
@@ -141,7 +181,7 @@ function fillAddressInput(element) {
     y += config.mainPin.w / 2;
   }
 
-  el.addressInput.value = `${x}, ${y}`;
+  el.submitForm.addressInput.value = `${x}, ${y}`;
 }
 
 function activate() {

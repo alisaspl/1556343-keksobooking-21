@@ -234,25 +234,26 @@ function createHTMLPinElement(advData) {
   return t;
 }
 
-function random(max) {
+function getRandomInteger(max) {
   return Math.floor(Math.random() * max);
 }
 
+function getRandomArrayElement(array) {
+  return array[getRandomInteger(array.length)];
+}
+
+function getRandomArrayElements(array) {
+  const numberOfElements = getRandomInteger(array.length);
+  const arrayCopy = array.concat();
+  for (let index = 0; index < numberOfElements; index++) {
+    arrayCopy.splice(getRandomInteger(arrayCopy.length), 1);
+  }
+  return arrayCopy;
+}
+
 function generateMockObject(i) {
-  const x = random((config.map.maxX + 1));
-  const y = random((config.map.maxY - config.map.minY + 1)) + config.map.minY;
-
-  const numberOfFeatures = random(features.length);
-  const featuresCopy = features.concat();
-  for (let index = 0; index < numberOfFeatures; index++) {
-    featuresCopy.splice(random(featuresCopy.length), 1);
-  }
-
-  const numberOfPhotos = random(photos.length);
-  const photosCopy = photos.concat();
-  for (let index = 0; index < numberOfPhotos; index++) {
-    photosCopy.splice(random(photosCopy.length), 1);
-  }
+  const x = getRandomInteger(config.map.maxX + 1);
+  const y = getRandomInteger(config.map.maxY - config.map.minY + 1) + config.map.minY;
 
   return {
     author: {
@@ -261,15 +262,15 @@ function generateMockObject(i) {
     offer: {
       title: hotels[i].title,
       address: `${x}, ${y}`,
-      price: random(config.maxPrice + 1),
-      type: types[random(types.length)],
-      rooms: random(config.maxRooms + 1),
-      guests: random(config.maxGuests + 1),
-      checkin: times[random(times.length)],
-      checkout: times[random(times.length)],
-      features: featuresCopy,
+      price: getRandomInteger(config.maxPrice + 1),
+      type: getRandomArrayElement(types),
+      rooms: getRandomInteger(config.maxRooms + 1),
+      guests: getRandomInteger(config.maxGuests + 1),
+      checkin: getRandomArrayElement(times),
+      checkout: getRandomArrayElement(times),
+      features: getRandomArrayElements(features),
       description: hotels[i].description,
-      photos: photosCopy,
+      photos: getRandomArrayElements(photos),
     },
     location: {x, y},
   };

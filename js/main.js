@@ -15,7 +15,15 @@ const config = {
   pin: {
     w: 50,
     h: 70,
-  }
+  },
+  mainPin: {
+    w: 62,
+    h: 74,
+  },
+};
+
+const state = {
+  map: null,
 };
 
 const types = [
@@ -46,6 +54,18 @@ if (mapPinTemplate instanceof HTMLTemplateElement) {
 } else {
   throw new Error(`pin template not found`);
 }
+
+const el = {
+  map: document.querySelector(`.map`),
+  form: document.querySelector(`.ad-form`),
+  filters: document.querySelector(`.map__filters`),
+  mapPin: document.querySelector(`.map__pin--main`),
+  submitForm: {
+    addressInput: document.querySelector(`input#address`),
+    roomsInput: document.querySelector(`select#room_number`),
+    guestsInput: document.querySelector(`select#capacity`),
+  },
+};
 
 // Mock data ///////////////////////////////
 
@@ -96,9 +116,104 @@ const mockData = [];
 for (let i = 0; i < 8; i++) {
   mockData.push(generateMockObject(i));
 }
-renderPinsOnMap(mockData);
+
+deactivate();
+fillAddressInput(el.mapPin);
+disableGuests();
+validateGuests();
+
+el.mapPin.addEventListener(`mousedown`, function (ev) {
+  if (ev.button === 0) {
+    fillAddressInput(el.mapPin);
+    activate();
+  }
+});
+
+el.mapPin.addEventListener(`keydown`, function (ev) {
+  if (ev.key === `Enter`) {
+    activate();
+  }
+});
+
+el.submitForm.roomsInput.addEventListener(`change`, function () {
+  disableGuests();
+  validateGuests();
+});
+
+el.submitForm.guestsInput.addEventListener(`change`, function () {
+  validateGuests();
+});
 
 // Functions ///////////////////////
+
+function validateGuests() {
+  const input = el.submitForm.guestsInput;
+  if (input.options[input.selectedIndex].disabled) {
+    input.setCustomValidity(`error`);
+  } else {
+    input.setCustomValidity(``);
+  }
+}
+
+function disableGuests() {
+  const roomsNumber = parseInt(el.submitForm.roomsInput.value, 10);
+  const guests = el.submitForm.guestsInput;
+
+  for (let i = 0; i < guests.options.length; i++) {
+    const guestsNumber = parseInt(guests.options[i].value, 10);
+    if (roomsNumber === 100 && guestsNumber !== 0) {
+      guests.options[i].disabled = true;
+    } else if (guestsNumber > roomsNumber || (guestsNumber === 0 && roomsNumber !== 100)) {
+      guests.options[i].disabled = true;
+    } else {
+      guests.options[i].disabled = false;
+    }
+  }
+}
+
+function fillAddressInput(element) {
+  const x = element.offsetLeft + config.mainPin.w / 2 + config.map.minX;
+  let y = element.offsetTop + config.map.minY;
+
+  if (state.map) {
+    y += config.mainPin.h;
+  } else {
+    y += config.mainPin.w / 2;
+  }
+
+  el.submitForm.addressInput.value = `${x}, ${y}`;
+}
+
+function activate() {
+  state.map = true;
+  renderPinsOnMap(mockData);
+  el.map.classList.remove(`map--faded`);
+  el.form.classList.remove(`ad-form--disabled`);
+  el.filters.classList.remove(`ad-form--disabled`);
+  toggleDisableInputs(el.form, false);
+  toggleDisableInputs(el.filters, false);
+}
+
+function deactivate() {
+  state.map = false;
+  el.map.classList.add(`map--faded`);
+  el.form.classList.add(`ad-form--disabled`);
+  el.filters.classList.add(`ad-form--disabled`);
+  toggleDisableInputs(el.form, true);
+  toggleDisableInputs(el.filters, true);
+}
+
+function toggleDisableInputs(form, disable) {
+  const inputs = form.querySelectorAll(`input,select,textarea`);
+  for (let i = 0; i < inputs.length; i++) {
+    const fieldset = inputs[i].closest(`fieldset`);
+    if (fieldset) {
+      fieldset.disabled = disable;
+    } else {
+      inputs[i].disabled = disable;
+    }
+  }
+}
 
 function renderPinsOnMap(advsData) {
   const advContainer = document.createDocumentFragment();
@@ -119,25 +234,26 @@ function createHTMLPinElement(advData) {
   return t;
 }
 
-function random(max) {
+function getRandomInteger(max) {
   return Math.floor(Math.random() * max);
 }
 
+function getRandomArrayElement(array) {
+  return array[getRandomInteger(array.length)];
+}
+
+function getRandomArrayElements(array) {
+  const numberOfElements = getRandomInteger(array.length);
+  const arrayCopy = array.concat();
+  for (let index = 0; index < numberOfElements; index++) {
+    arrayCopy.splice(getRandomInteger(arrayCopy.length), 1);
+  }
+  return arrayCopy;
+}
+
 function generateMockObject(i) {
-  const x = random((config.map.maxX + 1));
-  const y = random((config.map.maxY - config.map.minY + 1)) + config.map.minY;
-
-  const numberOfFeatures = random(features.length);
-  const featuresCopy = features.concat();
-  for (let index = 0; index < numberOfFeatures; index++) {
-    featuresCopy.splice(random(featuresCopy.length), 1);
-  }
-
-  const numberOfPhotos = random(photos.length);
-  const photosCopy = photos.concat();
-  for (let index = 0; index < numberOfPhotos; index++) {
-    photosCopy.splice(random(photosCopy.length), 1);
-  }
+  const x = getRandomInteger(config.map.maxX + 1);
+  const y = getRandomInteger(config.map.maxY - config.map.minY + 1) + config.map.minY;
 
   return {
     author: {
@@ -146,15 +262,15 @@ function generateMockObject(i) {
     offer: {
       title: hotels[i].title,
       address: `${x}, ${y}`,
-      price: random(config.maxPrice + 1),
-      type: types[random(types.length)],
-      rooms: random(config.maxRooms + 1),
-      guests: random(config.maxGuests + 1),
-      checkin: times[random(times.length)],
-      checkout: times[random(times.length)],
-      features: featuresCopy,
+      price: getRandomInteger(config.maxPrice + 1),
+      type: getRandomArrayElement(types),
+      rooms: getRandomInteger(config.maxRooms + 1),
+      guests: getRandomInteger(config.maxGuests + 1),
+      checkin: getRandomArrayElement(times),
+      checkout: getRandomArrayElement(times),
+      features: getRandomArrayElements(features),
       description: hotels[i].description,
-      photos: photosCopy,
+      photos: getRandomArrayElements(photos),
     },
     location: {x, y},
   };

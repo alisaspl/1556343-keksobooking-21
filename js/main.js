@@ -18,15 +18,15 @@ window.addEventListener(`load`, function () {
   form.disableGuests();
   form.validateGuests();
 
-  map.pin.addEventListener(`mousedown`, function (ev) {
-    if (ev.button === 0) {
+  map.pin.addEventListener(`mousedown`, function (evt) {
+    if (evt.button === 0) {
       form.fillAddressInput(map.pin);
       activate(mockData);
     }
   });
 
-  map.pin.addEventListener(`keydown`, function (ev) {
-    if (ev.key === `Enter`) {
+  map.pin.addEventListener(`keydown`, function (evt) {
+    if (evt.key === `Enter`) {
       activate(mockData);
     }
   });

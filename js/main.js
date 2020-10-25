@@ -4,12 +4,13 @@ window.addEventListener(`load`, function () {
   const state = window.state;
   const form = window.form;
   const map = window.map;
+  const mockData = window.mockData;
 
   // Runtime ////////////////////
 
-  const mockData = [];
+  const data = [];
   for (let i = 0; i < 8; i++) {
-    mockData.push(window.generateMockObject(i));
+    data.push(mockData.generateMockObject(i));
   }
 
   deactivate();
@@ -21,21 +22,21 @@ window.addEventListener(`load`, function () {
   map.pin.addEventListener(`mousedown`, function (evt) {
     if (evt.button === 0) {
       form.fillAddressInput(map.pin);
-      activate(mockData);
+      activate(data);
     }
   });
 
   map.pin.addEventListener(`keydown`, function (evt) {
     if (evt.key === `Enter`) {
-      activate(mockData);
+      activate(data);
     }
   });
 
   // Functions ///////////////////////
 
-  function activate(data) {
+  function activate(pinsData) {
     state.map = true;
-    map.renderPinsOnMap(data);
+    map.renderPinsOnMap(pinsData);
     map.show(true);
     form.showForm(true);
     form.showFilters(true);

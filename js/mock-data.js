@@ -49,7 +49,7 @@
 
   // Functions ///////////////////////////////
 
-  window.generateMockObject = function (i) {
+  function generateMockObject(i) {
     const x = getRandomInteger(config.map.maxX + 1);
     const y = getRandomInteger(config.map.maxY - config.map.minY + 1) + config.map.minY;
 
@@ -72,7 +72,7 @@
       },
       location: {x, y},
     };
-  };
+  }
 
   function getRandomInteger(max) {
     return Math.floor(Math.random() * max);
@@ -90,5 +90,9 @@
     }
     return arrayCopy;
   }
+
+  window.mockData = {
+    generateMockObject
+  };
 
 })();

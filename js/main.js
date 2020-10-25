@@ -6,6 +6,8 @@ window.addEventListener(`load`, function () {
   const map = window.map;
   const data = window.data;
 
+  const errorOverlay = document.querySelector(`.data-request-error`);
+
   /*
   const mockData = window.mockData;
   const dataPin = [];
@@ -24,7 +26,8 @@ window.addEventListener(`load`, function () {
 
   data.get((error, pinsData) => {
     if (error !== null) {
-      alert(error);
+      errorOverlay.textContent = error.message;
+      errorOverlay.classList.remove(`hidden`);
     } else {
       map.pin.addEventListener(`mousedown`, function (evt) {
         if (evt.button === 0) {

@@ -8,6 +8,11 @@ window.config = {
   maxPrice: 20000,
   maxRooms: 20,
   maxGuests: 500,
+  dataRequest: {
+    url: `https://21.javascript.pages.academy/keksobooking/data`,
+    method: `GET`,
+    timeout: 5 * 1000,
+  },
   map: {
     minX: 0,
     maxX: 1000,

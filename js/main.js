@@ -4,13 +4,19 @@ window.addEventListener(`load`, function () {
   const state = window.state;
   const form = window.form;
   const map = window.map;
+  const data = window.data;
+
+  const errorOverlay = document.querySelector(`.data-request-error`);
+
+  /*
+  const mockData = window.mockData;
+  const dataPin = [];
+  for (let i = 0; i < 8; i++) {
+    dataPin.push(mockData.generateMockObject(i));
+  }
+  */
 
   // Runtime ////////////////////
-
-  const mockData = [];
-  for (let i = 0; i < 8; i++) {
-    mockData.push(window.generateMockObject(i));
-  }
 
   deactivate();
 
@@ -18,24 +24,30 @@ window.addEventListener(`load`, function () {
   form.disableGuests();
   form.validateGuests();
 
-  map.pin.addEventListener(`mousedown`, function (evt) {
-    if (evt.button === 0) {
-      form.fillAddressInput(map.pin);
-      activate(mockData);
-    }
-  });
-
-  map.pin.addEventListener(`keydown`, function (evt) {
-    if (evt.key === `Enter`) {
-      activate(mockData);
+  data.get((error, pinsData) => {
+    if (error !== null) {
+      errorOverlay.textContent = error.message;
+      errorOverlay.classList.remove(`hidden`);
+    } else {
+      map.pin.addEventListener(`mousedown`, function (evt) {
+        if (evt.button === 0) {
+          form.fillAddressInput(map.pin);
+          activate(pinsData);
+        }
+      });
+      map.pin.addEventListener(`keydown`, function (evt) {
+        if (evt.key === `Enter`) {
+          activate(pinsData);
+        }
+      });
     }
   });
 
   // Functions ///////////////////////
 
-  function activate(data) {
+  function activate(pinsData) {
     state.map = true;
-    map.renderPinsOnMap(data);
+    map.renderPinsOnMap(pinsData);
     map.show(true);
     form.showForm(true);
     form.showFilters(true);

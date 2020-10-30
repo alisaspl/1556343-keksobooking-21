@@ -22,14 +22,8 @@
 
   function apply(pinsData) {
     let houseTypeValue = el.houseTypeInput.value;
-    let filtredArray = [];
-
-    filtredArray = pinsData.filter((element) => {
-      if (element.offer.type === houseTypeValue || houseTypeValue === `any`) {
-        return true;
-      } else {
-        return false;
-      }
+    let filtredArray = pinsData.filter((element) => {
+      return element.offer.type === houseTypeValue || houseTypeValue === `any`;
     });
 
     if (filtredArray.length > 5) {

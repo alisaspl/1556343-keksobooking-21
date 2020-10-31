@@ -6,7 +6,8 @@
 
   const el = {
     map: document.querySelector(`.map`),
-    mapPin: document.querySelector(`.map__pin--main`),
+    mapPinMain: document.querySelector(`.map__pin--main`),
+    mapPins: document.querySelector(`.map__pins`),
   };
 
   let mapPinTemplate = document.querySelector(`#pin`);
@@ -19,11 +20,17 @@
   // Functions ////////////////////////////////////////
 
   function renderPinsOnMap(advsData) {
+    el.mapPins.querySelectorAll(`button.map__pin`).forEach((element) => {
+      if (element !== el.mapPinMain) {
+        element.remove();
+      }
+    });
+
     const advContainer = document.createDocumentFragment();
     for (let i = 0; i < advsData.length; i++) {
       advContainer.appendChild(createHTMLPinElement(advsData[i]));
     }
-    document.querySelector(`.map__pins`).appendChild(advContainer);
+    el.mapPins.appendChild(advContainer);
   }
 
   function createHTMLPinElement(advData) {
@@ -38,7 +45,7 @@
   }
 
   window.map = {
-    pin: el.mapPin,
+    pin: el.mapPinMain,
     renderPinsOnMap,
     show: (show) => {
       if (show) {

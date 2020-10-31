@@ -5,6 +5,7 @@ window.addEventListener(`load`, function () {
   const form = window.form;
   const map = window.map;
   const data = window.data;
+  const filter = window.filter;
 
   const errorOverlay = document.querySelector(`.data-request-error`);
 
@@ -29,6 +30,7 @@ window.addEventListener(`load`, function () {
       errorOverlay.textContent = error.message;
       errorOverlay.classList.remove(`hidden`);
     } else {
+      pinsData = filter.apply(pinsData);
       map.pin.addEventListener(`mousedown`, function (evt) {
         if (evt.button === 0) {
           form.fillAddressInput(map.pin);
@@ -50,7 +52,7 @@ window.addEventListener(`load`, function () {
     map.renderPinsOnMap(pinsData);
     map.show(true);
     form.showForm(true);
-    form.showFilters(true);
+    form.showFilters(pinsData.length > 0);
   }
 
   function deactivate() {

@@ -1,5 +1,4 @@
 'use strict';
-
 (function () {
 
   const config = window.config;

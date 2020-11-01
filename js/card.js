@@ -1,12 +1,12 @@
 'use strict';
 (function () {
+
   const config = window.config;
 
   const container = document
     .querySelector(`.map`)
     .querySelector(`.map__filters-container`);
-  let template = document.querySelector(`#card`);
-  template = template.content.firstElementChild;
+  const template = document.querySelector(`#card`).content.firstElementChild;
 
   function render(cardData) {
     const card = template.cloneNode(true);

@@ -33,6 +33,12 @@ window.config = {
     `house`,
     `bungalow`,
   ],
+  typesTranslation: [
+    `Дворец`,
+    `Квартира`,
+    `Дом`,
+    `Бунгало`,
+  ],
   times: [
     `12:00`,
     `13:00`,

@@ -6,7 +6,6 @@ window.addEventListener(`load`, function () {
   const map = window.map;
   const data = window.data;
   const filter = window.filter;
-  const card = window.card;
   const errorOverlay = document.querySelector(`.data-request-error`);
 
   /*
@@ -24,6 +23,7 @@ window.addEventListener(`load`, function () {
   form.fillAddressInput(map.pin);
   form.disableGuests();
   form.validateGuests();
+  form.validatePrice();
 
   data.get((error, pinsData) => {
     if (error !== null) {
@@ -48,7 +48,6 @@ window.addEventListener(`load`, function () {
   // Functions ///////////////////////
 
   function activate(pinsData) {
-    card.render(pinsData[0]);
     state.map = true;
     map.renderPinsOnMap(pinsData);
     map.show(true);

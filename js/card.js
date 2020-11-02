@@ -3,12 +3,12 @@
 
   const config = window.config;
 
-  const container = document
-    .querySelector(`.map`)
-    .querySelector(`.map__filters-container`);
+  const container = document.querySelector(`.map`);
   const template = document.querySelector(`#card`).content.firstElementChild;
 
   function render(cardData) {
+    close();
+
     const card = template.cloneNode(true);
 
     setTextContentOrHide(cardData.offer.description, card.querySelector(`.popup__description`));
@@ -53,7 +53,26 @@
     photoTemplate.remove();
 
     card.querySelector(`.popup__avatar`).src = cardData.author.avatar;
-    container.before(card);
+
+    card.querySelector(`.popup__close`).addEventListener(`click`, close);
+
+    container.querySelector(`.map__filters-container`).before(card);
+
+    document.addEventListener(`keydown`, closeByKeydown);
+  }
+
+  function close() {
+    const previousCard = container.querySelector(`article.map__card`);
+    if (previousCard) {
+      previousCard.remove();
+    }
+    document.removeEventListener(`keydown`, closeByKeydown);
+  }
+
+  function closeByKeydown(evt) {
+    if (evt.key === `Escape`) {
+      close();
+    }
   }
 
   function setTextContentOrHide(text, element) {

@@ -2,6 +2,7 @@
 (function () {
 
   const config = window.config;
+  const card = window.card;
 
   const el = {
     map: document.querySelector(`.map`),
@@ -40,6 +41,11 @@
     `;
     t.firstElementChild.src = advData.author.avatar;
     t.firstElementChild.alt = advData.offer.title;
+
+    t.addEventListener(`click`, () => {
+      card.render(advData);
+    });
+
     return t;
   }
 

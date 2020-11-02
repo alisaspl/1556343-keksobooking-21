@@ -11,16 +11,25 @@
       addressInput: document.querySelector(`input#address`),
       roomsInput: document.querySelector(`select#room_number`),
       guestsInput: document.querySelector(`select#capacity`),
+      typeInput: document.querySelector(`select#type`),
+      priceInput: document.querySelector(`input#price`),
+      timeinInput: document.querySelector(`select#timein`),
+      timeoutInput: document.querySelector(`select#timeout`),
     },
   };
 
-  el.submitForm.roomsInput.addEventListener(`change`, function () {
+  el.submitForm.roomsInput.addEventListener(`change`, () => {
     disableGuests();
     validateGuests();
   });
+  el.submitForm.guestsInput.addEventListener(`change`, validateGuests);
+  el.submitForm.typeInput.addEventListener(`change`, validatePrice);
 
-  el.submitForm.guestsInput.addEventListener(`change`, function () {
-    validateGuests();
+  el.submitForm.timeinInput.addEventListener(`change`, () => {
+    el.submitForm.timeoutInput.value = el.submitForm.timeinInput.value;
+  });
+  el.submitForm.timeoutInput.addEventListener(`change`, () => {
+    el.submitForm.timeinInput.value = el.submitForm.timeoutInput.value;
   });
 
   // Functions ///////////////////////
@@ -62,6 +71,13 @@
     }
   }
 
+  function validatePrice() {
+    const minPrice = config.typesMinPrice[
+      config.types.indexOf(el.submitForm.typeInput.value)
+    ];
+    el.submitForm.priceInput.min = el.submitForm.priceInput.placeholder = minPrice;
+  }
+
   function fillAddressInput(element) {
     const x = element.offsetLeft + config.mainPin.w / 2 + config.map.minX;
     let y = element.offsetTop + config.map.minY;
@@ -79,6 +95,7 @@
     fillAddressInput,
     disableGuests,
     validateGuests,
+    validatePrice,
     showForm: (show) => {
       if (show) {
         el.form.classList.remove(`ad-form--disabled`);

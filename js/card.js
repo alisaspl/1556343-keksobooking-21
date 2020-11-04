@@ -7,7 +7,7 @@
   const template = document.querySelector(`#card`).content.firstElementChild;
 
   function render(cardData) {
-    close();
+    closeMainPinCard();
 
     const card = template.cloneNode(true);
 
@@ -54,14 +54,14 @@
 
     card.querySelector(`.popup__avatar`).src = cardData.author.avatar;
 
-    card.querySelector(`.popup__close`).addEventListener(`click`, close);
+    card.querySelector(`.popup__close`).addEventListener(`click`, closeMainPinCard);
 
     container.querySelector(`.map__filters-container`).before(card);
 
     document.addEventListener(`keydown`, closeByKeydown);
   }
 
-  function close() {
+  function closeMainPinCard() {
     const previousCard = container.querySelector(`article.map__card`);
     if (previousCard) {
       previousCard.remove();
@@ -71,7 +71,7 @@
 
   function closeByKeydown(evt) {
     if (evt.key === `Escape`) {
-      close();
+      closeMainPinCard();
     }
   }
 

@@ -34,19 +34,19 @@
   }
 
   function createHTMLPinElement(advData) {
-    const t = mapPinTemplate.firstElementChild.cloneNode(true);
-    t.style = `
+    const template = mapPinTemplate.firstElementChild.cloneNode(true);
+    template.style = `
       left: ${advData.location.x + (config.pin.w / 2) + config.map.minX}px;
       top: ${advData.location.y - config.pin.h + config.map.minY}px
     `;
-    t.firstElementChild.src = advData.author.avatar;
-    t.firstElementChild.alt = advData.offer.title;
+    template.firstElementChild.src = advData.author.avatar;
+    template.firstElementChild.alt = advData.offer.title;
 
-    t.addEventListener(`click`, () => {
+    template.addEventListener(`click`, () => {
       card.render(advData);
     });
 
-    return t;
+    return template;
   }
 
   window.map = {

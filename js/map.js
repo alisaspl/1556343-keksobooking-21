@@ -3,6 +3,7 @@
 
   const config = window.config;
   const card = window.card;
+  const form = window.form;
 
   const el = {
     map: document.querySelector(`.map`),
@@ -58,6 +59,8 @@
         el.mapPinMain.style.top = config.map.maxY + `px`;
       }
     }
+
+    form.fillAddressInput(el.mapPinMain);
   }
 
   function renderPinsOnMap(advsData) {

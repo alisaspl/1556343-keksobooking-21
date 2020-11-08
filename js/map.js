@@ -3,11 +3,13 @@
 
   const config = window.config;
   const card = window.card;
+  const form = window.form;
 
   const el = {
     map: document.querySelector(`.map`),
     mapPinMain: document.querySelector(`.map__pin--main`),
     mapPins: document.querySelector(`.map__pins`),
+    htmlTag: document.getElementsByTagName(`html`)[0],
   };
 
   let mapPinTemplate = document.querySelector(`#pin`);
@@ -17,7 +19,49 @@
     throw new Error(`pin template not found`);
   }
 
+  el.mapPinMain.addEventListener(`mousedown`, onMouseDown);
+
+
   // Functions ////////////////////////////////////////
+
+  function onMouseDown() {
+    document.addEventListener(`mouseup`, onMouseUp);
+    document.addEventListener(`mousemove`, onMouseMove);
+  }
+  function onMouseUp() {
+    document.removeEventListener(`mouseup`, onMouseUp);
+    document.removeEventListener(`mousemove`, onMouseMove);
+  }
+
+  function onMouseMove(evt) {
+    const x = evt.pageX - config.mainPin.w / 2 - (el.htmlTag.clientWidth - el.map.clientWidth) / 2;
+    const y = evt.pageY - config.mainPin.h - (el.htmlTag.clientHeight - el.map.clientHeight) / 2;
+
+    const minX = config.map.minX - config.mainPin.w / 2;
+    const maxX = el.map.clientWidth - config.mainPin.w / 2;
+
+    if (x > minX && x < maxX) {
+      el.mapPinMain.style.left = x + `px`;
+    } else {
+      if (x < minX) {
+        el.mapPinMain.style.left = minX + `px`;
+      } else {
+        el.mapPinMain.style.left = maxX + `px`;
+      }
+    }
+
+    if (y > config.map.minY && y < config.map.maxY) {
+      el.mapPinMain.style.top = y + `px`;
+    } else {
+      if (y < config.map.maxY) {
+        el.mapPinMain.style.top = config.map.minY + `px`;
+      } else {
+        el.mapPinMain.style.top = config.map.maxY + `px`;
+      }
+    }
+
+    form.fillAddressInput(el.mapPinMain);
+  }
 
   function renderPinsOnMap(advsData) {
     el.mapPins.querySelectorAll(`button.map__pin`).forEach((element) => {
@@ -34,19 +78,19 @@
   }
 
   function createHTMLPinElement(advData) {
-    const t = mapPinTemplate.firstElementChild.cloneNode(true);
-    t.style = `
+    const template = mapPinTemplate.firstElementChild.cloneNode(true);
+    template.style = `
       left: ${advData.location.x + (config.pin.w / 2) + config.map.minX}px;
       top: ${advData.location.y - config.pin.h + config.map.minY}px
     `;
-    t.firstElementChild.src = advData.author.avatar;
-    t.firstElementChild.alt = advData.offer.title;
+    template.firstElementChild.src = advData.author.avatar;
+    template.firstElementChild.alt = advData.offer.title;
 
-    t.addEventListener(`click`, () => {
+    template.addEventListener(`click`, () => {
       card.render(advData);
     });
 
-    return t;
+    return template;
   }
 
   window.map = {

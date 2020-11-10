@@ -13,6 +13,9 @@ window.config = {
     method: `GET`,
     timeout: 5 * 1000,
   },
+  submitRequest: {
+    timeout: 5 * 1000,
+  },
   map: {
     minX: 0,
     maxX: 1000,

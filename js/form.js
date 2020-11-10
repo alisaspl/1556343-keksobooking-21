@@ -16,7 +16,20 @@
       timeinInput: document.querySelector(`select#timein`),
       timeoutInput: document.querySelector(`select#timeout`),
     },
+    notificationContainer: document.querySelector(`main`),
+    successNotification: document.querySelector(`template#success`)
+      .content.firstElementChild.cloneNode(true),
+    errorNotification: document.querySelector(`template#error`)
+      .content.firstElementChild.cloneNode(true),
+    submitFormBtn: document.querySelector(`.ad-form__submit`),
+    resetFormBtn: document.querySelector(`.ad-form__reset`),
   };
+
+  el.successNotification.classList.add(`hidden`);
+  el.notificationContainer.appendChild(el.successNotification);
+
+  el.errorNotification.classList.add(`hidden`);
+  el.notificationContainer.appendChild(el.errorNotification);
 
   el.submitForm.roomsInput.addEventListener(`change`, () => {
     disableGuests();
@@ -32,7 +45,90 @@
     el.submitForm.timeinInput.value = el.submitForm.timeoutInput.value;
   });
 
+  el.resetFormBtn.addEventListener(`click`, resetForm);
+
+  el.form.addEventListener(`submit`, formSubmit);
+
   // Functions ///////////////////////
+
+  function formSubmit(evt) {
+    evt.preventDefault();
+    let req = new XMLHttpRequest();
+
+    req.onload = function () {
+      if (req.status !== 200) {
+        return formSubmitError(new Error(`HTTP error`));
+      }
+      let data;
+      try {
+        data = JSON.parse(req.responseText);
+      } catch (error) {
+        return formSubmitError(new Error(`JSON error`));
+      }
+      return formSubmitSuccess(data);
+    };
+
+    req.onerror = function () {
+      formSubmitError(new Error(`HTTP error`));
+    };
+
+    req.ontimeout = function () {
+      formSubmitError(new Error(`HTTP timeout`));
+    };
+    req.timeout = config.submitRequest.timeout;
+
+    req.open(el.form.method, el.form.action);
+    req.send(new FormData(el.form));
+  }
+
+  el.successNotification.addEventListener(`click`, function () {
+    toggleNotification(el.successNotification, false);
+  });
+  el.errorNotification.addEventListener(`click`, function () {
+    toggleNotification(el.errorNotification, false);
+  });
+  el.errorNotification.querySelector(`button.error__button`).addEventListener(`click`, function () {
+    toggleNotification(el.errorNotification, false);
+  });
+  document.addEventListener(`keydown`, function (evt) {
+    if (evt.key === `Escape`) {
+      if (!el.successNotification.classList.contains(`hidden`)) {
+        toggleNotification(el.successNotification, false);
+      }
+      if (!el.errorNotification.classList.contains(`hidden`)) {
+        toggleNotification(el.errorNotification, false);
+      }
+    }
+  });
+
+  function formSubmitSuccess() {
+    resetForm();
+    toggleNotification(el.successNotification, true);
+  }
+
+  function formSubmitError() {
+    toggleNotification(el.errorNotification, true);
+  }
+
+  function toggleNotification(notificationElement, show) {
+    if (show) {
+      el.submitFormBtn.disabled = true;
+      notificationElement.classList.remove(`hidden`);
+    } else {
+      el.submitFormBtn.disabled = false;
+      notificationElement.classList.add(`hidden`);
+    }
+  }
+
+  function resetForm() {
+    el.form.reset();
+    setTimeout(() => {
+      disableGuests();
+      validateGuests();
+      validatePrice();
+      fillAddressInput(window.map.pin);
+    }, 0);
+  }
 
   function toggleDisableInputs(formEl, disable) {
     const inputs = formEl.querySelectorAll(`input,select,textarea`);

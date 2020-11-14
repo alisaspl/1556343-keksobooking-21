@@ -5,7 +5,7 @@ window.state = {
 };
 
 window.config = {
-  maxPrice: 20000,
+  maxPrice: 10000000, // fixme: ask
   maxRooms: 20,
   maxGuests: 500,
   dataRequest: {
@@ -48,6 +48,24 @@ window.config = {
     5000,
     0,
   ],
+  priceTypes: {
+    any: {
+      min: 0,
+      max: 0,
+    },
+    low: {
+      min: 0,
+      max: 9999,
+    },
+    middle: {
+      min: 10000,
+      max: 49999,
+    },
+    high: {
+      min: 50000,
+      max: 0,
+    },
+  },
   times: [
     `12:00`,
     `13:00`,
@@ -62,3 +80,6 @@ window.config = {
     `conditioner`,
   ],
 };
+
+window.config.priceTypes.any.max = window.config.maxPrice;
+window.config.priceTypes.high.max = window.config.maxPrice;

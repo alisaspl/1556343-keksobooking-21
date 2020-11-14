@@ -4,6 +4,7 @@
   const data = window.data;
   const map = window.map;
   const config = window.config;
+  const card = window.card;
 
   const el = {
     houseTypeInput: document.querySelector(`select#housing-type`),
@@ -28,6 +29,7 @@
       clearTimeout(getDataDebounceTimeoutId);
     }
     getDataDebounceTimeoutId = setTimeout(getData, config.filterDebounceTimeout);
+    card.closeMainPinCard();
   }
 
   function getData() {
@@ -79,6 +81,7 @@
     if (filtredArray.length > 5) {
       filtredArray.length = 5;
     }
+
     return filtredArray;
   }
 

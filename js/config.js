@@ -6,7 +6,7 @@ window.state = {
 
 window.config = {
   filterDebounceTimeout: 500,
-  maxPrice: 10000000, // fixme: ask
+  maxPrice: 10000000,
   maxRooms: 20,
   maxGuests: 500,
   dataRequest: {

@@ -85,6 +85,7 @@
 
   window.card = {
     render,
+    closeMainPinCard,
   };
 
 })();

@@ -5,6 +5,7 @@ window.state = {
 };
 
 window.config = {
+  filterDebounceTimeout: 500,
   maxPrice: 10000000, // fixme: ask
   maxRooms: 20,
   maxGuests: 500,

@@ -14,12 +14,20 @@
     errorOverlay: document.querySelector(`.data-request-error`),
   };
 
-  el.houseTypeInput.addEventListener(`change`, getData);
-  el.priceInput.addEventListener(`change`, getData);
-  el.roomsNumberInput.addEventListener(`change`, getData);
-  el.guestsNumberInput.addEventListener(`change`, getData);
+  el.houseTypeInput.addEventListener(`change`, getDataDebounce);
+  el.priceInput.addEventListener(`change`, getDataDebounce);
+  el.roomsNumberInput.addEventListener(`change`, getDataDebounce);
+  el.guestsNumberInput.addEventListener(`change`, getDataDebounce);
   for (let i = 0; i < el.features.elements.length; i++) {
-    el.features.elements[i].addEventListener(`change`, getData);
+    el.features.elements[i].addEventListener(`change`, getDataDebounce);
+  }
+
+  let getDataDebounceTimeoutId;
+  function getDataDebounce() {
+    if (getDataDebounceTimeoutId) {
+      clearTimeout(getDataDebounceTimeoutId);
+    }
+    getDataDebounceTimeoutId = setTimeout(getData, config.filterDebounceTimeout);
   }
 
   function getData() {

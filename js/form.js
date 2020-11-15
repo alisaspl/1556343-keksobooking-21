@@ -81,16 +81,16 @@
     req.send(new FormData(el.form));
   }
 
-  el.successNotification.addEventListener(`click`, function () {
+  el.successNotification.addEventListener(`click`, () => {
     toggleNotification(el.successNotification, false);
   });
-  el.errorNotification.addEventListener(`click`, function () {
+  el.errorNotification.addEventListener(`click`, () => {
     toggleNotification(el.errorNotification, false);
   });
-  el.errorNotification.querySelector(`button.error__button`).addEventListener(`click`, function () {
+  el.errorNotification.querySelector(`button.error__button`).addEventListener(`click`, () => {
     toggleNotification(el.errorNotification, false);
   });
-  document.addEventListener(`keydown`, function (evt) {
+  document.addEventListener(`keydown`, (evt) => {
     if (evt.key === `Escape`) {
       if (!el.successNotification.classList.contains(`hidden`)) {
         toggleNotification(el.successNotification, false);

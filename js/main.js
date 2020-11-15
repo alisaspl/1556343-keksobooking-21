@@ -1,6 +1,6 @@
 'use strict';
 
-window.addEventListener(`load`, function () {
+window.addEventListener(`load`, () => {
   const state = window.state;
   const form = window.form;
   const map = window.map;
@@ -8,13 +8,6 @@ window.addEventListener(`load`, function () {
   const filter = window.filter;
   const errorOverlay = document.querySelector(`.data-request-error`);
 
-  /*
-  const mockData = window.mockData;
-  const dataPin = [];
-  for (let i = 0; i < 8; i++) {
-    dataPin.push(mockData.generateMockObject(i));
-  }
-  */
 
   // Runtime ////////////////////
 
@@ -31,13 +24,13 @@ window.addEventListener(`load`, function () {
       errorOverlay.classList.remove(`hidden`);
     } else {
       pinsData = filter.apply(pinsData);
-      map.pin.addEventListener(`mousedown`, function (evt) {
+      map.pin.addEventListener(`mousedown`, (evt) => {
         if (evt.button === 0) {
           form.fillAddressInput(map.pin);
           activate(pinsData);
         }
       });
-      map.pin.addEventListener(`keydown`, function (evt) {
+      map.pin.addEventListener(`keydown`, (evt) => {
         if (evt.key === `Enter`) {
           activate(pinsData);
         }

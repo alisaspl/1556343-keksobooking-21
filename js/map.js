@@ -4,11 +4,12 @@
   const config = window.config;
   const card = window.card;
   const form = window.form;
+  let filter;
 
-  const el = {
+  const element = {
     map: document.querySelector(`.map`),
     mapPinMain: document.querySelector(`.map__pin--main`),
-    mapPins: document.querySelector(`.map__pins`),
+    mapPinsContainer: document.querySelector(`.map__pins`),
     htmlTag: document.getElementsByTagName(`html`)[0],
   };
 
@@ -19,14 +20,14 @@
     throw new Error(`pin template not found`);
   }
 
-  el.mapPinMain.addEventListener(`mousedown`, onMouseDown);
+  element.mapPinMain.addEventListener(`mousedown`, onMouseDown);
 
-
-  // Functions ////////////////////////////////////////
-
-  function onMouseDown() {
-    document.addEventListener(`mouseup`, onMouseUp);
-    document.addEventListener(`mousemove`, onMouseMove);
+  function onMouseDown(evt) {
+    if (evt.button === config.mouseEventButtonType.left) {
+      filter.reset();
+      document.addEventListener(`mouseup`, onMouseUp);
+      document.addEventListener(`mousemove`, onMouseMove);
+    }
   }
   function onMouseUp() {
     document.removeEventListener(`mouseup`, onMouseUp);
@@ -34,59 +35,66 @@
   }
 
   function onMouseMove(evt) {
-    const x = evt.pageX - config.mainPin.w / 2 - (el.htmlTag.clientWidth - el.map.clientWidth) / 2;
-    const y = evt.pageY - config.mainPin.h - (el.htmlTag.clientHeight - el.map.clientHeight) / 2;
+    const xCoordinate = evt.pageX - config.mainPin.width / 2 - (element.htmlTag.clientWidth - element.map.clientWidth) / 2;
+    const yCoordinate = evt.pageY - config.mainPin.height / 2;
 
-    const minX = config.map.minX - config.mainPin.w / 2;
-    const maxX = el.map.clientWidth - config.mainPin.w / 2;
+    const minXCoordinate = config.map.minX - config.mainPin.width / 2;
+    const maxXCoordinate = element.map.clientWidth - config.mainPin.width / 2;
 
-    if (x > minX && x < maxX) {
-      el.mapPinMain.style.left = x + `px`;
+    if (xCoordinate > minXCoordinate && xCoordinate < maxXCoordinate) {
+      element.mapPinMain.style.left = xCoordinate + `px`;
     } else {
-      if (x < minX) {
-        el.mapPinMain.style.left = minX + `px`;
+      if (xCoordinate < minXCoordinate) {
+        element.mapPinMain.style.left = minXCoordinate + `px`;
       } else {
-        el.mapPinMain.style.left = maxX + `px`;
+        element.mapPinMain.style.left = maxXCoordinate + `px`;
       }
     }
 
-    if (y > config.map.minY && y < config.map.maxY) {
-      el.mapPinMain.style.top = y + `px`;
+    if (yCoordinate > config.map.minY && yCoordinate < config.map.maxY) {
+      element.mapPinMain.style.top = yCoordinate + `px`;
     } else {
-      if (y < config.map.maxY) {
-        el.mapPinMain.style.top = config.map.minY + `px`;
+      if (yCoordinate < config.map.maxY) {
+        element.mapPinMain.style.top = config.map.minY + `px`;
       } else {
-        el.mapPinMain.style.top = config.map.maxY + `px`;
+        element.mapPinMain.style.top = config.map.maxY + `px`;
       }
     }
 
-    form.fillAddressInput(el.mapPinMain);
+    form.fillAddressInput(element.mapPinMain);
+  }
+
+  function removePins() {
+    element.mapPinsContainer.querySelectorAll(`button.map__pin`).forEach((pin) => {
+      if (pin !== element.mapPinMain) {
+        pin.remove();
+      }
+    });
   }
 
   function renderPinsOnMap(advsData) {
-    el.mapPins.querySelectorAll(`button.map__pin`).forEach((element) => {
-      if (element !== el.mapPinMain) {
-        element.remove();
-      }
-    });
-
+    removePins();
     const advContainer = document.createDocumentFragment();
     for (let i = 0; i < advsData.length; i++) {
       advContainer.appendChild(createHTMLPinElement(advsData[i]));
     }
-    el.mapPins.appendChild(advContainer);
+    element.mapPinsContainer.appendChild(advContainer);
   }
 
   function createHTMLPinElement(advData) {
     const template = mapPinTemplate.firstElementChild.cloneNode(true);
     template.style = `
-      left: ${advData.location.x + (config.pin.w / 2) + config.map.minX}px;
-      top: ${advData.location.y - config.pin.h + config.map.minY}px
+      left: ${advData.location.x - (config.pin.width / 2)}px;
+      top: ${advData.location.y - config.pin.heightWithoutPointer}px
     `;
     template.firstElementChild.src = advData.author.avatar;
     template.firstElementChild.alt = advData.offer.title;
 
     template.addEventListener(`click`, () => {
+      element.mapPinsContainer.querySelectorAll(`button.map__pin--active`).forEach((pinElement) => {
+        pinElement.classList.remove(`map__pin--active`);
+      });
+      template.classList.add(`map__pin--active`);
       card.render(advData);
     });
 
@@ -94,14 +102,18 @@
   }
 
   window.map = {
-    pin: el.mapPinMain,
+    pin: element.mapPinMain,
     renderPinsOnMap,
     show: (show) => {
       if (show) {
-        el.map.classList.remove(`map--faded`);
+        element.map.classList.remove(`map--faded`);
       } else {
-        el.map.classList.add(`map--faded`);
+        removePins();
+        element.map.classList.add(`map--faded`);
       }
+    },
+    setFilterModule: (filterModule) => {
+      filter = filterModule;
     },
   };
 

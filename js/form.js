@@ -2,11 +2,11 @@
 (function () {
 
   const config = window.config;
+  const utils = window.utils;
   const state = window.state;
 
-  const el = {
+  const element = {
     form: document.querySelector(`.ad-form`),
-    filters: document.querySelector(`.map__filters`),
     submitForm: {
       addressInput: document.querySelector(`input#address`),
       roomsInput: document.querySelector(`select#room_number`),
@@ -21,107 +21,109 @@
       .content.firstElementChild.cloneNode(true),
     errorNotification: document.querySelector(`template#error`)
       .content.firstElementChild.cloneNode(true),
-    submitFormBtn: document.querySelector(`.ad-form__submit`),
-    resetFormBtn: document.querySelector(`.ad-form__reset`),
+    submitFormButton: document.querySelector(`.ad-form__submit`),
+    resetFormButton: document.querySelector(`.ad-form__reset`),
   };
 
-  el.successNotification.classList.add(`hidden`);
-  el.notificationContainer.appendChild(el.successNotification);
+  let deactivate = () => {};
 
-  el.errorNotification.classList.add(`hidden`);
-  el.notificationContainer.appendChild(el.errorNotification);
+  element.successNotification.classList.add(`hidden`);
+  element.notificationContainer.appendChild(element.successNotification);
 
-  el.submitForm.roomsInput.addEventListener(`change`, () => {
+  element.errorNotification.classList.add(`hidden`);
+  element.notificationContainer.appendChild(element.errorNotification);
+
+  element.submitForm.roomsInput.addEventListener(`change`, () => {
     disableGuests();
     validateGuests();
   });
-  el.submitForm.guestsInput.addEventListener(`change`, validateGuests);
-  el.submitForm.typeInput.addEventListener(`change`, validatePrice);
+  element.submitForm.guestsInput.addEventListener(`change`, validateGuests);
+  element.submitForm.typeInput.addEventListener(`change`, validatePrice);
 
-  el.submitForm.timeinInput.addEventListener(`change`, () => {
-    el.submitForm.timeoutInput.value = el.submitForm.timeinInput.value;
+  element.submitForm.timeinInput.addEventListener(`change`, () => {
+    element.submitForm.timeoutInput.value = element.submitForm.timeinInput.value;
   });
-  el.submitForm.timeoutInput.addEventListener(`change`, () => {
-    el.submitForm.timeinInput.value = el.submitForm.timeoutInput.value;
+  element.submitForm.timeoutInput.addEventListener(`change`, () => {
+    element.submitForm.timeinInput.value = element.submitForm.timeoutInput.value;
   });
 
-  el.resetFormBtn.addEventListener(`click`, resetForm);
+  element.resetFormButton.addEventListener(`click`, resetForm);
 
-  el.form.addEventListener(`submit`, formSubmit);
+  element.form.addEventListener(`submit`, submitForm);
 
-  // Functions ///////////////////////
-
-  function formSubmit(evt) {
+  function submitForm(evt) {
     evt.preventDefault();
-    let req = new XMLHttpRequest();
+    let request = new XMLHttpRequest();
 
-    req.onload = function () {
-      if (req.status !== 200) {
-        return formSubmitError(new Error(`HTTP error`));
+    request.onload = function () {
+      if (request.status !== 200) {
+        return handleFormSubmitError(new Error(`HTTP error`));
       }
       let data;
       try {
-        data = JSON.parse(req.responseText);
+        data = JSON.parse(request.responseText);
       } catch (error) {
-        return formSubmitError(new Error(`JSON error`));
+        return handleFormSubmitError(new Error(`JSON error`));
       }
-      return formSubmitSuccess(data);
+      return handleFormSubmitSuccess(data);
     };
 
-    req.onerror = function () {
-      formSubmitError(new Error(`HTTP error`));
+    request.onerror = function () {
+      handleFormSubmitError(new Error(`HTTP error`));
     };
 
-    req.ontimeout = function () {
-      formSubmitError(new Error(`HTTP timeout`));
+    request.ontimeout = function () {
+      handleFormSubmitError(new Error(`HTTP timeout`));
     };
-    req.timeout = config.submitRequest.timeout;
+    request.timeout = config.submitRequest.timeout;
 
-    req.open(el.form.method, el.form.action);
-    req.send(new FormData(el.form));
+    request.open(element.form.method, element.form.action);
+    request.send(new FormData(element.form));
   }
 
-  el.successNotification.addEventListener(`click`, () => {
-    toggleNotification(el.successNotification, false);
+  element.successNotification.addEventListener(`click`, () => {
+    toggleNotification(element.successNotification, false);
   });
-  el.errorNotification.addEventListener(`click`, () => {
-    toggleNotification(el.errorNotification, false);
+  element.errorNotification.addEventListener(`click`, () => {
+    toggleNotification(element.errorNotification, false);
   });
-  el.errorNotification.querySelector(`button.error__button`).addEventListener(`click`, () => {
-    toggleNotification(el.errorNotification, false);
+  element.errorNotification.querySelector(`button.error__button`).addEventListener(`click`, () => {
+    toggleNotification(element.errorNotification, false);
   });
   document.addEventListener(`keydown`, (evt) => {
     if (evt.key === `Escape`) {
-      if (!el.successNotification.classList.contains(`hidden`)) {
-        toggleNotification(el.successNotification, false);
+      if (!element.successNotification.classList.contains(`hidden`)) {
+        toggleNotification(element.successNotification, false);
       }
-      if (!el.errorNotification.classList.contains(`hidden`)) {
-        toggleNotification(el.errorNotification, false);
+      if (!element.errorNotification.classList.contains(`hidden`)) {
+        toggleNotification(element.errorNotification, false);
       }
     }
   });
 
-  function formSubmitSuccess() {
+  function handleFormSubmitSuccess() {
+    deactivate();
     resetForm();
-    toggleNotification(el.successNotification, true);
+    toggleNotification(element.successNotification, true);
   }
 
-  function formSubmitError() {
-    toggleNotification(el.errorNotification, true);
+  function handleFormSubmitError() {
+    toggleNotification(element.errorNotification, true);
   }
 
   function toggleNotification(notificationElement, show) {
     if (show) {
-      el.submitFormBtn.disabled = true;
+      element.submitFormButton.disabled = true;
       notificationElement.classList.remove(`hidden`);
     } else {
-      el.submitFormBtn.disabled = false;
+      element.submitFormButton.disabled = false;
       notificationElement.classList.add(`hidden`);
     }
   }
 
   function resetForm() {
-    el.form.reset();
+    deactivate();
+    element.form.reset();
     setTimeout(() => {
       disableGuests();
       validateGuests();
@@ -130,20 +132,8 @@
     }, 0);
   }
 
-  function toggleDisableInputs(formEl, disable) {
-    const inputs = formEl.querySelectorAll(`input,select,textarea`);
-    for (let i = 0; i < inputs.length; i++) {
-      const fieldset = inputs[i].closest(`fieldset`);
-      if (fieldset) {
-        fieldset.disabled = disable;
-      } else {
-        inputs[i].disabled = disable;
-      }
-    }
-  }
-
   function validateGuests() {
-    const input = el.submitForm.guestsInput;
+    const input = element.submitForm.guestsInput;
     if (input.options[input.selectedIndex].disabled) {
       input.setCustomValidity(`error`);
     } else {
@@ -152,39 +142,39 @@
   }
 
   function disableGuests() {
-    const roomsNumber = parseInt(el.submitForm.roomsInput.value, 10);
-    const guests = el.submitForm.guestsInput;
+    const roomsNumber = parseInt(element.submitForm.roomsInput.value, 10);
+    const guestsInput = element.submitForm.guestsInput;
 
-    for (let i = 0; i < guests.options.length; i++) {
-      const guestsNumber = parseInt(guests.options[i].value, 10);
+    for (let i = 0; i < guestsInput.options.length; i++) {
+      const guestsNumber = parseInt(guestsInput.options[i].value, 10);
       if (roomsNumber === 100 && guestsNumber !== 0) {
-        guests.options[i].disabled = true;
+        guestsInput.options[i].disabled = true;
       } else if (guestsNumber > roomsNumber || (guestsNumber === 0 && roomsNumber !== 100)) {
-        guests.options[i].disabled = true;
+        guestsInput.options[i].disabled = true;
       } else {
-        guests.options[i].disabled = false;
+        guestsInput.options[i].disabled = false;
       }
     }
   }
 
   function validatePrice() {
     const minPrice = config.typesMinPrice[
-      config.types.indexOf(el.submitForm.typeInput.value)
+      config.types.indexOf(element.submitForm.typeInput.value)
     ];
-    el.submitForm.priceInput.min = el.submitForm.priceInput.placeholder = minPrice;
+    element.submitForm.priceInput.min = element.submitForm.priceInput.placeholder = minPrice;
   }
 
-  function fillAddressInput(element) {
-    const x = element.offsetLeft + config.mainPin.w / 2 + config.map.minX;
-    let y = element.offsetTop + config.map.minY;
+  function fillAddressInput(mainPinElement) {
+    const xCoordinate = mainPinElement.offsetLeft + config.mainPin.width / 2 + config.map.minX;
+    let yCoordinate = mainPinElement.offsetTop + config.map.minY;
 
     if (state.map) {
-      y += config.mainPin.h;
+      yCoordinate -= config.mainPin.height;
     } else {
-      y += config.mainPin.w / 2;
+      yCoordinate -= config.mainPin.width / 2;
     }
 
-    el.submitForm.addressInput.value = `${x}, ${y}`;
+    element.submitForm.addressInput.value = `${xCoordinate}, ${yCoordinate}`;
   }
 
   window.form = {
@@ -192,24 +182,18 @@
     disableGuests,
     validateGuests,
     validatePrice,
-    showForm: (show) => {
+    show: (show) => {
       if (show) {
-        el.form.classList.remove(`ad-form--disabled`);
-        toggleDisableInputs(el.form, false);
+        element.form.classList.remove(`ad-form--disabled`);
+        utils.toggleDisableInputs(element.form, false);
       } else {
-        el.form.classList.add(`ad-form--disabled`);
-        toggleDisableInputs(el.form, true);
+        element.form.classList.add(`ad-form--disabled`);
+        utils.toggleDisableInputs(element.form, true);
       }
     },
-    showFilters: (show) => {
-      if (show) {
-        el.filters.classList.remove(`ad-form--disabled`);
-        toggleDisableInputs(el.filters, false);
-      } else {
-        el.filters.classList.add(`ad-form--disabled`);
-        toggleDisableInputs(el.filters, true);
-      }
-    },
+    setDeactivateFunction: (deactivateFunction) => {
+      deactivate = deactivateFunction;
+    }
   };
 
 })();

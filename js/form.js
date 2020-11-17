@@ -53,7 +53,7 @@
 
   function submitForm(evt) {
     evt.preventDefault();
-    let request = new XMLHttpRequest();
+    const request = new XMLHttpRequest();
 
     request.onload = function () {
       if (request.status !== 200) {

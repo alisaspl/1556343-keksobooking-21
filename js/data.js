@@ -4,32 +4,32 @@
   const config = window.config.dataRequest;
 
   function getData(cb) {
-    let req = new XMLHttpRequest();
+    const request = new XMLHttpRequest();
 
-    req.onload = function () {
-      if (req.status !== 200) {
+    request.onload = function () {
+      if (request.status !== 200) {
         return cb(new Error(`HTTP error`));
       }
       let data;
       try {
-        data = JSON.parse(req.responseText);
+        data = JSON.parse(request.responseText);
       } catch (error) {
         return cb(new Error(`JSON error`));
       }
       return cb(null, data);
     };
 
-    req.onerror = function () {
+    request.onerror = function () {
       cb(new Error(`HTTP error`));
     };
 
-    req.ontimeout = function () {
+    request.ontimeout = function () {
       cb(new Error(`HTTP timeout`));
     };
-    req.timeout = config.timeout;
+    request.timeout = config.timeout;
 
-    req.open(config.method, config.url);
-    req.send();
+    request.open(config.method, config.url);
+    request.send();
   }
 
   window.data = {

@@ -36,12 +36,16 @@
     ];
     setTextContentOrHide(houseTypeText, card.querySelector(`.popup__type`));
 
-    card.querySelectorAll(`li.popup__feature`).forEach((element) => {
-      element.classList.add(`hidden`);
-    });
-    cardData.offer.features.forEach((element) => {
-      card.querySelector(`.popup__feature--${element}`).classList.remove(`hidden`);
-    });
+    if (cardData.offer.features.length === 0) {
+      card.querySelector(`ul.popup__features`).classList.add(`hidden`);
+    } else {
+      card.querySelectorAll(`li.popup__feature`).forEach((element) => {
+        element.classList.add(`hidden`);
+      });
+      cardData.offer.features.forEach((element) => {
+        card.querySelector(`.popup__feature--${element}`).classList.remove(`hidden`);
+      });
+    }
 
     const photoTemplate = card.querySelector(`img.popup__photo`);
     const photoContainer = card.querySelector(`div.popup__photos`);
@@ -85,6 +89,7 @@
 
   window.card = {
     render,
+    closeMainPinCard,
   };
 
 })();

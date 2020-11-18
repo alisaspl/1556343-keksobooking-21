@@ -13,14 +13,10 @@
     htmlTag: document.getElementsByTagName(`html`)[0],
   };
 
-  let mapPinTemplate = document.querySelector(`#pin`);
-  if (mapPinTemplate instanceof HTMLTemplateElement) {
-    mapPinTemplate = mapPinTemplate.content;
-  } else {
-    throw new Error(`pin template not found`);
-  }
-
+  let mapPinTemplate = document.querySelector(`#pin`).content;
   element.mapPinMain.addEventListener(`mousedown`, onMouseDown);
+
+  card.setCloseCardHandler(removeActivePinHighlight);
 
   function onMouseDown(evt) {
     if (evt.button === config.mouseEventButtonType.left) {
@@ -36,7 +32,8 @@
 
   function onMouseMove(evt) {
     const xCoordinate = evt.pageX - config.mainPin.width / 2 - (element.htmlTag.clientWidth - element.map.clientWidth) / 2;
-    const yCoordinate = evt.pageY - config.mainPin.height / 2;
+    const yCoordinate = evt.pageY;
+    const halfHeight = config.mainPin.height / 2;
 
     const minXCoordinate = config.map.minX - config.mainPin.width / 2;
     const maxXCoordinate = element.map.clientWidth - config.mainPin.width / 2;
@@ -51,13 +48,13 @@
       }
     }
 
-    if (yCoordinate > config.map.minY && yCoordinate < config.map.maxY) {
-      element.mapPinMain.style.top = yCoordinate + `px`;
+    if (yCoordinate + halfHeight > config.map.minY && yCoordinate + halfHeight < config.map.maxY) {
+      element.mapPinMain.style.top = (yCoordinate - halfHeight) + `px`;
     } else {
-      if (yCoordinate < config.map.maxY) {
-        element.mapPinMain.style.top = config.map.minY + `px`;
+      if (yCoordinate + halfHeight < config.map.maxY) {
+        element.mapPinMain.style.top = (config.map.minY - config.mainPin.height) + `px`;
       } else {
-        element.mapPinMain.style.top = config.map.maxY + `px`;
+        element.mapPinMain.style.top = (config.map.maxY - config.mainPin.height) + `px`;
       }
     }
 
@@ -81,21 +78,26 @@
     element.mapPinsContainer.appendChild(advContainer);
   }
 
+  function removeActivePinHighlight() {
+    const activePin = element.mapPinsContainer.querySelector(`button.map__pin--active`);
+    if (activePin) {
+      activePin.classList.remove(`map__pin--active`);
+    }
+  }
+
   function createHTMLPinElement(advData) {
     const template = mapPinTemplate.firstElementChild.cloneNode(true);
     template.style = `
       left: ${advData.location.x - (config.pin.width / 2)}px;
-      top: ${advData.location.y - config.pin.heightWithoutPointer}px
+      top: ${advData.location.y - config.pin.height}px
     `;
     template.firstElementChild.src = advData.author.avatar;
     template.firstElementChild.alt = advData.offer.title;
 
     template.addEventListener(`click`, () => {
-      element.mapPinsContainer.querySelectorAll(`button.map__pin--active`).forEach((pinElement) => {
-        pinElement.classList.remove(`map__pin--active`);
-      });
-      template.classList.add(`map__pin--active`);
       card.render(advData);
+      removeActivePinHighlight();
+      template.classList.add(`map__pin--active`);
     });
 
     return template;

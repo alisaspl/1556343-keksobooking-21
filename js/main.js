@@ -7,6 +7,7 @@
     const map = window.map;
     const data = window.data;
     const filter = window.filter;
+    const card = window.card;
 
     const errorOverlay = document.querySelector(`.data-request-error`);
 
@@ -57,6 +58,7 @@
       map.show(false);
       form.show(false);
       filter.show(false);
+      card.closeMainPinCard();
       map.pin.style.left = mapPinInitialCoordinates.xCoordinate;
       map.pin.style.top = mapPinInitialCoordinates.yCoordinate;
     }

@@ -1,10 +1,6 @@
 'use strict';
 (function () {
 
-  window.state = {
-    map: null,
-  };
-
   window.config = {
     mouseEventButtonType: {
       left: 0,
@@ -17,6 +13,10 @@
       url: `https://21.javascript.pages.academy/keksobooking/data`,
       method: `GET`,
       timeout: 5 * 1000,
+      httpResponseStatusOK: 200,
+      httpErrorText: `Произошла сетевая ошибка, проверьте соединение`,
+      jsonErrorText: `Произошла ошибка на стороне сервера, мы уже чиним её`,
+      htttpTimeoutErrorText: `Время выполнения запроса истекло, попробуйте зайти позже`,
     },
     submitRequest: {
       timeout: 5 * 1000,
@@ -30,11 +30,10 @@
     pin: {
       width: 50,
       height: 70,
-      heightWithoutPointer: 50,
     },
     mainPin: {
-      width: 62,
-      height: 74,
+      width: 65,
+      height: 80,
     },
     types: [
       `palace`,
@@ -85,6 +84,8 @@
       `elevator`,
       `conditioner`,
     ],
+    maxElementsOnMap: 5,
+    errorMessageNotValidGuestInput: `Данное количество гостей не может быть выбрано`,
   };
 
   window.config.priceTypes.any.max = window.config.maxPrice;

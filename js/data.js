@@ -7,24 +7,24 @@
     const request = new XMLHttpRequest();
 
     request.onload = function () {
-      if (request.status !== 200) {
-        return cb(new Error(`HTTP error`));
+      if (request.status !== config.httpResponseStatusOK) {
+        return cb(new Error(config.httpErrorText));
       }
       let data;
       try {
         data = JSON.parse(request.responseText);
       } catch (error) {
-        return cb(new Error(`JSON error`));
+        return cb(new Error(config.jsonErrorText));
       }
       return cb(null, data);
     };
 
     request.onerror = function () {
-      cb(new Error(`HTTP error`));
+      cb(new Error(config.httpErrorText));
     };
 
     request.ontimeout = function () {
-      cb(new Error(`HTTP timeout`));
+      cb(new Error(config.htttpTimeoutErrorText));
     };
     request.timeout = config.timeout;
 

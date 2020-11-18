@@ -56,24 +56,24 @@
     const request = new XMLHttpRequest();
 
     request.onload = function () {
-      if (request.status !== 200) {
-        return handleFormSubmitError(new Error(`HTTP error`));
+      if (request.status !== config.dataRequest.httpResponseStatusOK) {
+        return handleFormSubmitError(new Error(config.dataRequest.httpErrorText));
       }
       let data;
       try {
         data = JSON.parse(request.responseText);
       } catch (error) {
-        return handleFormSubmitError(new Error(`JSON error`));
+        return handleFormSubmitError(new Error(config.dataRequest.jsonErrorText));
       }
       return handleFormSubmitSuccess(data);
     };
 
     request.onerror = function () {
-      handleFormSubmitError(new Error(`HTTP error`));
+      handleFormSubmitError(new Error(config.dataRequest.httpErrorText));
     };
 
     request.ontimeout = function () {
-      handleFormSubmitError(new Error(`HTTP timeout`));
+      handleFormSubmitError(new Error(config.dataRequest.htttpTimeoutErrorText));
     };
     request.timeout = config.submitRequest.timeout;
 
@@ -135,7 +135,7 @@
   function validateGuests() {
     const input = element.submitForm.guestsInput;
     if (input.options[input.selectedIndex].disabled) {
-      input.setCustomValidity(`error`);
+      input.setCustomValidity(config.errorMessageNotValidGuestInput);
     } else {
       input.setCustomValidity(``);
     }
@@ -166,15 +166,15 @@
 
   function fillAddressInput(mainPinElement) {
     const xCoordinate = mainPinElement.offsetLeft + config.mainPin.width / 2 + config.map.minX;
-    let yCoordinate = mainPinElement.offsetTop + config.map.minY;
+    let yCoordinate = mainPinElement.offsetTop;
 
     if (state.map) {
-      yCoordinate -= config.mainPin.height;
+      yCoordinate += config.mainPin.height;
     } else {
-      yCoordinate -= config.mainPin.width / 2;
+      yCoordinate += config.mainPin.width / 2;
     }
 
-    element.submitForm.addressInput.value = `${xCoordinate}, ${yCoordinate}`;
+    element.submitForm.addressInput.value = `${Math.floor(xCoordinate)}, ${Math.floor(yCoordinate)}`;
   }
 
   window.form = {

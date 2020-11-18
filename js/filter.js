@@ -13,15 +13,18 @@
   const priceInput = form.querySelector(`select#housing-price`);
   const roomsNumberInput = form.querySelector(`select#housing-rooms`);
   const guestsNumberInput = form.querySelector(`select#housing-guests`);
-  const featuresContainer = form.querySelector(`fieldset#housing-features`);
+  const featuresInputs = form
+    .querySelector(`fieldset#housing-features`)
+    .querySelectorAll(`input`);
 
   houseTypeInput.addEventListener(`change`, getDataDebounce);
   priceInput.addEventListener(`change`, getDataDebounce);
   roomsNumberInput.addEventListener(`change`, getDataDebounce);
   guestsNumberInput.addEventListener(`change`, getDataDebounce);
-  for (let i = 0; i < featuresContainer.elements.length; i++) {
-    featuresContainer.elements[i].addEventListener(`change`, getDataDebounce);
-  }
+
+  featuresInputs.forEach((input) => {
+    input.addEventListener(`change`, getDataDebounce);
+  });
 
   let getDataDebounceTimeoutId;
   function getDataDebounce() {
@@ -49,14 +52,15 @@
     const houseRoomsValue = roomsNumberInput.value;
     const houseGuestsValue = guestsNumberInput.value;
     const selectedFeatures = [];
-    for (let i = 0; i < featuresContainer.elements.length; i++) {
-      const feature = featuresContainer.elements[i];
-      if (feature.checked) {
-        selectedFeatures.push(feature.value);
+    featuresInputs.forEach((input) => {
+      if (input.checked) {
+        selectedFeatures.push(input.value);
       }
-    }
+    });
 
-    let filteredPins = pinsData.filter((element) => {
+    let filteredPins = [];
+    for (let i = 0; i < pinsData.length; i++) {
+      const element = pinsData[i];
       const isProperHouseType = element.offer.type === houseTypeValue || houseTypeValue === `any`;
       const isProperPrice = element.offer.price >= priceType.min && element.offer.price <= priceType.max;
       const isProperRoomsAmount = element.offer.rooms === parseInt(houseRoomsValue, 10) || houseRoomsValue === `any`;
@@ -64,11 +68,12 @@
       const areProperSelectedFeatures = selectedFeatures.every((feature) => {
         return element.offer.features.indexOf(feature) >= 0;
       });
-      return isProperHouseType && isProperPrice && isProperRoomsAmount && isProperGuestsAmount && areProperSelectedFeatures;
-    });
-
-    if (filteredPins.length > 5) {
-      filteredPins.length = 5;
+      if (isProperHouseType && isProperPrice && isProperRoomsAmount && isProperGuestsAmount && areProperSelectedFeatures) {
+        filteredPins.push(element);
+      }
+      if (filteredPins.length === config.maxElementsOnMap) {
+        break;
+      }
     }
 
     return filteredPins;
